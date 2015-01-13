@@ -331,8 +331,10 @@ NS_INLINE BOOL StringsMatchExceptLineBreaks(NSString *expected, NSString *actual
     
     // Now traverse the subviews of the subviews, adding matches
     for (UIView *view in self.subviews) {
-        NSArray * matchingSubviews = [view subviewsWithClassNameOrSuperClassNamePrefix:prefix];
-        [result addObjectsFromArray:matchingSubviews];
+        if (!view.hidden) {
+            NSArray * matchingSubviews = [view subviewsWithClassNameOrSuperClassNamePrefix:prefix];
+            [result addObjectsFromArray:matchingSubviews];
+        }
     }
 
     return result;
