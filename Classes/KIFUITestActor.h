@@ -329,6 +329,15 @@ static inline KIFDisplacement KIFDisplacementForSwipingInDirection(KIFSwipeDirec
 - (void) selectDatePickerValue:(NSArray*)datePickerColumnValues;
 
 /*!
+ @abstract Selects a value in a picker view with the given identifier.
+ @discussion This step will get the view with the specified accessibility identifier and find an items with the given titles, select that items.
+ Can be used to UIPickerValue and UIDatePicker.
+ @param titles The titles of the rows to select.
+ @param identifier Accessibility identifier of the picker view.
+ */
+- (void) selectPickerValue:(NSArray*)pickerColumnValues inPickerViewWithAccessibilityIdentifier:(NSString *)identifier;
+
+/*!
  @abstract Toggles a UISwitch into a specified position.
  @discussion The UISwitch with the given label is searched for in the view hierarchy. If the element isn't found or isn't currently tappable, then the step will attempt to wait until it is. Once the view is present, the step will return if it's already in the desired position. If the switch is tappable but not in the desired position, a tap event is simulated in the center of the view or element, toggling the switch into the desired position.
  @param switchIsOn The desired position of the UISwitch.
