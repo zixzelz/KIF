@@ -125,9 +125,13 @@
 }
 
 - (void)waitForAnimationsToFinish {
+    [self waitForAnimationsToFinishWithTimeout:self.animationWaitingTimeout];
+}
+
+- (void)waitForAnimationsToFinishWithTimeout:(NSTimeInterval)timeout {
     static const CGFloat kStabilizationWait = 0.5f;
     
-    NSTimeInterval maximumWaitingTimeInterval = self.animationWaitingTimeout;
+    NSTimeInterval maximumWaitingTimeInterval = timeout;
     if (maximumWaitingTimeInterval <= kStabilizationWait) {
         if(maximumWaitingTimeInterval >= 0) {
             [self waitForTimeInterval:maximumWaitingTimeInterval];
@@ -496,6 +500,7 @@
                 UILabel *label = (labels.count > 0 ? labels[0] : nil);
                 rowTitle = label.text;
             }
+            NSAssert(rowTitle != nil, @"Unknown picker type. Delegate responds neither to pickerView:titleForRow:forComponent: nor to pickerView:viewForRow:forComponent:reusingView:");
             [dataToSelect addObject: rowTitle];
         }
     }
