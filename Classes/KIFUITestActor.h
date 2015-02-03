@@ -525,6 +525,7 @@ static inline KIFDisplacement KIFDisplacementForSwipingInDirection(KIFSwipeDirec
  */
 
 - (void)moveRowAtIndexPath:(NSIndexPath *)sourceIndexPath toIndexPath:(NSIndexPath *)destinationIndexPath inTableViewWithAccessibilityIdentifier:(NSString *)identifier;
+
 /*!
  @abstract Remove the row at sourceIndexPath in a table view with the given identifier.
  @discussion This step will get the view with the specified accessibility identifier and remove the row at sourceIndexPath.
