@@ -773,6 +773,21 @@
     [self waitForAnimationsToFinish];
 }
 
+- (void)swipeRowAtIndexPath:(NSIndexPath *)indexPath inTableView:(UITableView *)tableView inDirection:(KIFSwipeDirection)direction
+{
+    const NSUInteger kNumberOfPointsInSwipePath = 20;
+    
+    UITableViewCell *cell = [self waitForCellAtIndexPath:indexPath inTableView:tableView];
+    CGRect cellFrame = [cell.contentView convertRect:cell.contentView.frame toView:tableView];
+    CGPoint swipeStart = CGPointCenteredInRect(cellFrame);
+    KIFDisplacement swipeDisplacement = KIFDisplacementForSwipingInDirection(direction);
+    [tableView dragFromPoint:swipeStart displacement:swipeDisplacement steps:kNumberOfPointsInSwipePath];
+    
+    // Wait for the view to stabilize.
+    [tester waitForTimeInterval:0.5];
+    
+}
+
 - (void)tapItemAtIndexPath:(NSIndexPath *)indexPath inCollectionViewWithAccessibilityIdentifier:(NSString *)identifier
 {
     UICollectionView *collectionView;
@@ -811,20 +826,21 @@
     UIAccessibilityElement *element = nil;
 
     [self waitForAccessibilityElement:&element view:&viewToSwipe withLabel:label value:value traits:traits tappable:NO];
-    [self swipeAccessibilityElement:element view:viewToSwipe inDirection:direction];
+    [self swipeAccessibilityElement:element inView:viewToSwipe inDirection:direction];
 }
 
-- (void)swipeAccessibilityElement:(UIAccessibilityElement *)element view:(UIView *)viewToSwipe inDirection:(KIFSwipeDirection)direction
+- (void)swipeAccessibilityElement:(UIAccessibilityElement *)element inView:(UIView *)viewToSwipe inDirection:(KIFSwipeDirection)direction
 {
-    const NSUInteger kNumberOfPointsInSwipePath = 20;
-    
     // The original version of this came from http://groups.google.com/group/kif-framework/browse_thread/thread/df3f47eff9f5ac8c
+  
+    const NSUInteger kNumberOfPointsInSwipePath = 20;
+  
     // Within this method, all geometry is done in the coordinate system of the view to swipe.
-
+  
     CGRect elementFrame = [viewToSwipe.windowOrIdentityWindow convertRect:element.accessibilityFrame toView:viewToSwipe];
     CGPoint swipeStart = CGPointCenteredInRect(elementFrame);
     KIFDisplacement swipeDisplacement = KIFDisplacementForSwipingInDirection(direction);
-
+  
     [viewToSwipe dragFromPoint:swipeStart displacement:swipeDisplacement steps:kNumberOfPointsInSwipePath];
 }
 
@@ -1043,7 +1059,7 @@
     UITableViewCell *cell = [self waitForCellAtIndexPath:indexPath inTableView:tableView];
     UIAccessibilityElement *element = [cell accessibilityElementAtIndex:0];
     
-    [self swipeAccessibilityElement:element view:cell inDirection:KIFSwipeDirectionLeft];
+    [self swipeAccessibilityElement:element inView:cell inDirection:KIFSwipeDirectionLeft];
     
     NSString *accessibilityLabel = @"Delete";
     UIAccessibilityElement *deleteElement = [cell accessibilityElementWithLabel:accessibilityLabel];
