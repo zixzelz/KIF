@@ -500,8 +500,12 @@
                 UILabel *label = (labels.count > 0 ? labels[0] : nil);
                 rowTitle = label.text;
             }
-            NSAssert(rowTitle != nil, @"Unknown picker type. Delegate responds neither to pickerView:titleForRow:forComponent: nor to pickerView:viewForRow:forComponent:reusingView:");
-            [dataToSelect addObject: rowTitle];
+            
+            if (rowTitle) {
+                [dataToSelect addObject: rowTitle];
+            } else {
+                @throw [NSException exceptionWithName:NSInternalInconsistencyException reason:@"Unknown picker type. Delegate responds neither to pickerView:titleForRow:forComponent: nor to pickerView:viewForRow:forComponent:reusingView:" userInfo:nil];
+            }
         }
     }
     
@@ -980,9 +984,20 @@
     [collectionView scrollToItemAtIndexPath:indexPath
                            atScrollPosition:UICollectionViewScrollPositionCenteredHorizontally | UICollectionViewScrollPositionCenteredVertically
                                    animated:YES];
-    [self waitForTimeInterval:0.5];
+
+    [self waitForAnimationsToFinish];
     UICollectionViewCell *cell = [collectionView cellForItemAtIndexPath:indexPath];
 
+    //For big collection views with many cells the cell might not be ready yet. Relayout and try again.
+    if(cell == nil) {
+        [collectionView layoutIfNeeded];
+        [collectionView scrollToItemAtIndexPath:indexPath
+                               atScrollPosition:UICollectionViewScrollPositionCenteredHorizontally | UICollectionViewScrollPositionCenteredVertically
+                                       animated:YES];
+        [self waitForAnimationsToFinish];
+        cell = [collectionView cellForItemAtIndexPath:indexPath];
+    }
+    
     if (!cell) {
         [self failWithError:[NSError KIFErrorWithFormat: @"Collection view cell at index path %@ not found", indexPath] stopTest:YES];
     }
@@ -1030,7 +1045,12 @@
     
     [self swipeAccessibilityElement:element view:cell inDirection:KIFSwipeDirectionLeft];
     
-    UIAccessibilityElement *deleteElement = [cell accessibilityElementWithLabel:@"Delete"];
+    NSString *accessibilityLabel = @"Delete";
+    UIAccessibilityElement *deleteElement = [cell accessibilityElementWithLabel:accessibilityLabel];
+    if (!deleteElement) {
+        [self failWithError:[NSError KIFErrorWithFormat: @"Failed to find accessibility element with the label \"%@\"", accessibilityLabel] stopTest:YES];
+    }
+    
     [self tapAccessibilityElement:deleteElement inView:cell];
 }
 
